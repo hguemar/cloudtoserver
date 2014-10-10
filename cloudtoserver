@@ -21,7 +21,7 @@
 # Author: Kushal Das <kdas@redhat.com>
 
 
-import os
+import subprocess
 import sys
 import argparse
 import yum
@@ -70,8 +70,8 @@ def main():
     convert_to_server()
     if args.stopci:
         print "Disabling cloud-init service on reboot."
-        cmd = "systemctl disable cloud-init.service"
-        os.system(cmd)
+        cmd = ["systemctl", "disable", "cloud-init"]
+        subprocess.call(cmd)
 
 
 if __name__ == '__main__':
