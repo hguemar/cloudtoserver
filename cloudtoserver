@@ -24,27 +24,30 @@
 import os
 import sys
 import argparse
+import yum
+from yum.Errors import InstallError
 
+# FIXME: should be a configuration file
+INSTALL_PKGS = ['fedora-release-server', 'firewalld-config-server']
+REMOVE_PKGS = ['fedora-release-cloud', 'firewalld-config-standard']
+SERVER_ENV = '@^server-product-environment'
 
 def convert_to_server():
     """This function tries to run a series of yum commands
 to convert a Fedora cloud instance into a Fedora server instance.
     """
-    cmd = "yum -y swap -- install fedora-release-server firewalld-config-server -- remove fedora-release-cloud firewalld-config-standard"
-    ret_code = os.system(cmd)
-    if ret_code != 0:
+    yb = yum.YumBase()
+    try:
+        for pkg in INSTALL_PKGS:
+            yb.install(name=pkg)
+        for pkg in REMOVE_PKGS:
+            yb.remove(name=pkg)
+        yb.install(pattern=SERVER_ENV)
+        yb.resolveDeps()
+        yb.processTransaction()
+    except InstallError as err:
         print "There was issues while converting to Fedora Server. Please report the error"
         print "Use https://paste.fedoraproject.org for pasting the output from this command."
-        return
-
-    # Now we now that fedora-release server is in the system
-    # We will try to pull down the rest of the packages. 
-    cmd = "yum install @^server-product-environment -y"
-    ret_code = os.system(cmd)
-    if ret_code != 0:
-        print "Error while installing packages. Please check the network."
-        return
-
 
 def main():
     """
