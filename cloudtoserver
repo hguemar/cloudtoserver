@@ -61,10 +61,10 @@ def main():
     print "This will try to convert your Fedora cloud instance to a Fedora Server instance."
     while True:
         inp = raw_input("Continue? y/N: ")
-        inp = inp.strip()
-        if inp == 'N':
+        inp = inp.strip().lower()
+        if inp == 'n':
             return
-        if inp.upper() == 'Y':
+        if inp == 'y':
             break
     # Now the normal flow of the application
     convert_to_server()
